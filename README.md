@@ -20,19 +20,22 @@ import "github.com/avesanen/fsdb"
 import "log"
 
 func main() {
-	fsdb := fsdb.NewFsDb('./db')
+	fsdb, err := fsdb.NewFsDb("db")
+	if err != nil {
+		panic(err)
+	}
 
 	item := map[string]interface{}{
 		"msg": "Hello world!",
 	}
 
-	// Write the item 'hello' to collection 'messages'.
-	if err := fsdb.Write('messages','hello') err != nil {
+	// Write the item "hello" to collection "messages".
+	if err := fsdb.Write("messages", "hello", item); err != nil {
 		panic(err)
 	}
 
-	// Read item 'hello' from collection 'messages'.
-	msg, err := fsdb.Read('messages', 'hello')
+	// Read item "hello" from collection "messages".
+	msg, err := fsdb.Read("messages", "hello")
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +43,7 @@ func main() {
 	log.Println(msg)
 
 	// Delete item from collection
-	if err := fsdb.Delete('messages', 'hello'); err != nil {
+	if err := fsdb.Delete("messages", "hello"); err != nil {
 		panic(err)
 	}
 }

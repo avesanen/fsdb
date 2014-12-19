@@ -1,4 +1,4 @@
-package main
+package fsdb
 
 import "testing"
 import "os"

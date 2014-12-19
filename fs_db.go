@@ -1,10 +1,9 @@
-package main
+package fsdb
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	//"log"
 	"errors"
+	"io/ioutil"
 	"os"
 	"sync"
 	"time"
@@ -91,6 +90,19 @@ func NewFsDb(path string) (*FsDb, error) {
 	db := &FsDb{}
 	db.Path = path
 	db.Collections = make(map[string]*collection)
+
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// The path didn't exist, create it.
+			if err := os.Mkdir(path, 0777); err != nil {
+				return nil, err
+			}
+		} else {
+			// Some other error, return it.
+			return nil, err
+		}
+	}
 
 	dbCollections, err := ioutil.ReadDir(path)
 	if err != nil {
