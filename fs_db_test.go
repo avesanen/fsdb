@@ -4,19 +4,9 @@ import "testing"
 import "os"
 
 func TestOpen(t *testing.T) {
-	//dbPath := os.TempDir() + string(os.PathSeparator) + "db"
-	dbPath := "./db"
+	dbPath := os.TempDir() + string(os.PathSeparator) + "db"
 	if err := os.RemoveAll(dbPath); err != nil {
 		t.Fatal(err.Error())
-	}
-
-	fsdb, err := NewFsDb(dbPath)
-	if err == nil {
-		t.Fatal("should fail if db doesn't exist.")
-	}
-
-	if fsdb != nil {
-		t.Fatal("fsdb created, test failing.")
 	}
 
 	os.Mkdir(dbPath, 0777)
@@ -32,7 +22,7 @@ func TestOpen(t *testing.T) {
 		file.Close()
 	}
 
-	fsdb, err = NewFsDb(dbPath)
+	fsdb, err := NewFsDb(dbPath)
 	if err != nil {
 		t.Fatal("should not fail if db does exist.")
 	}
@@ -81,4 +71,7 @@ func TestOpen(t *testing.T) {
 	}
 
 	t.Log(fsdb)
+	if err := os.RemoveAll(dbPath); err != nil {
+		t.Fatal(err.Error())
+	}
 }
