@@ -3,7 +3,14 @@ package fsdb
 import "testing"
 import "os"
 
+type TestType struct {
+	Name string `json:"name"`
+}
+
 func TestOpen(t *testing.T) {
+	tt := &TestType{}
+	tt.Name = "This is TestType!"
+
 	dbPath := os.TempDir() + string(os.PathSeparator) + "db"
 	if err := os.RemoveAll(dbPath); err != nil {
 		t.Fatal(err.Error())
@@ -48,15 +55,15 @@ func TestOpen(t *testing.T) {
 		"msg": "Hello world!",
 	}
 
-	if err := fsdb.Write("col1", "key1", msg); err != nil {
+	if err := fsdb.Write("col1", "key1", 5623524); err != nil {
 		t.Fatal(err.Error())
 	}
 
-	if err := fsdb.Write("col2", "key2", msg); err != nil {
+	if err := fsdb.Write("col2", "key2", "hello"); err != nil {
 		t.Fatal(err.Error())
 	}
 
-	if err := fsdb.Write("col3", "key3", msg); err != nil {
+	if err := fsdb.Write("col3", "key3", 12); err != nil {
 		t.Fatal(err.Error())
 	}
 

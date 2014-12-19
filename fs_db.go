@@ -95,7 +95,7 @@ func (db *FsDb) newCollection(name string) (*collection, error) {
 }
 
 // Write to key in collection
-func (db *FsDb) Write(col, key string, v map[string]interface{}) error {
+func (db *FsDb) Write(col, key string, v interface{}) error {
 	if db.Collections[col] == nil {
 		c, err := db.newCollection(col)
 		if err != nil {
@@ -107,7 +107,7 @@ func (db *FsDb) Write(col, key string, v map[string]interface{}) error {
 }
 
 // Read key from collection
-func (db *FsDb) Read(col string, key string) (map[string]interface{}, error) {
+func (db *FsDb) Read(col string, key string) (interface{}, error) {
 	if db.Collections[col] == nil {
 		return nil, errors.New("collection does not exist: " + col)
 	}

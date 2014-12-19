@@ -9,16 +9,16 @@ import (
 
 // Key is a Key in collection
 type key struct {
-	Name       string                 `json:"name"`
-	Path       string                 `json:"-"`
-	File       os.File                `json:"-"`
-	LastAccess time.Time              `json:"lastAccess"`
-	Content    map[string]interface{} `json:"content"`
+	Name       string      `json:"name"`
+	Path       string      `json:"-"`
+	File       os.File     `json:"-"`
+	LastAccess time.Time   `json:"lastAccess"`
+	Content    interface{} `json:"content"`
 	*sync.RWMutex
 }
 
-// read will return a map[string]interface{} or error
-func (k *key) read() (map[string]interface{}, error) {
+// read will return a interface{} or error
+func (k *key) read() (interface{}, error) {
 	k.RLock()
 	defer k.RUnlock()
 	k.LastAccess = time.Now()
@@ -43,8 +43,8 @@ func (k *key) read() (map[string]interface{}, error) {
 	return k.Content, nil
 }
 
-// Write will write a map[string]interface{} to a file, or error.
-func (k *key) write(v map[string]interface{}) error {
+// Write will write a interface{} to a file, or error.
+func (k *key) write(v interface{}) error {
 	k.Lock()
 	defer k.Unlock()
 	k.LastAccess = time.Now()

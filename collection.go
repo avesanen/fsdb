@@ -13,15 +13,15 @@ type collection struct {
 	Keys map[string]*key `json:"keys"`
 }
 
-func (c *collection) read(key string) (map[string]interface{}, error) {
+func (c *collection) read(key string) (interface{}, error) {
 	if c.Keys[key] == nil {
 		return nil, errors.New("key does not exist: " + key)
 	}
 	return c.Keys[key].read()
 }
 
-// Write will write a map[string]interface{} to a file, or error.
-func (c *collection) write(key string, v map[string]interface{}) error {
+// Write will write a interface{} to a file, or error.
+func (c *collection) write(key string, v interface{}) error {
 	if c.Keys[key] == nil {
 		k, err := c.newKey(key)
 		if err != nil {
