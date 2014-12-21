@@ -13,14 +13,15 @@ type collection struct {
 	Keys map[string]*key `json:"keys"`
 }
 
-func (c *collection) read(key string) (interface{}, error) {
+// read will read key to v
+func (c *collection) read(key string, v interface{}) error {
 	if c.Keys[key] == nil {
-		return nil, errors.New("key does not exist: " + key)
+		return errors.New("key does not exist: " + key)
 	}
-	return c.Keys[key].read()
+	return c.Keys[key].read(v)
 }
 
-// Write will write a interface{} to a file, or error.
+// write will write v to key
 func (c *collection) write(key string, v interface{}) error {
 	if c.Keys[key] == nil {
 		k, err := c.newKey(key)
@@ -29,14 +30,10 @@ func (c *collection) write(key string, v interface{}) error {
 		}
 		c.Keys[key] = k
 	}
-
-	if err := c.Keys[key].write(v); err != nil {
-		return err
-	}
-	return nil
+	return c.Keys[key].write(v)
 }
 
-// delete will delete the key if it exist in this collection
+// delete will delete the key
 func (c *collection) delete(key string) error {
 	if c.Keys[key] == nil {
 		return errors.New("key does not exist: " + key)
@@ -49,7 +46,7 @@ func (c *collection) delete(key string) error {
 	return nil
 }
 
-// Key return a new key
+// newKey returns a new key
 func (c *collection) newKey(name string) (*key, error) {
 	path := c.Path + string(os.PathSeparator) + name
 	k := &key{}

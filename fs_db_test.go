@@ -8,77 +8,31 @@ type TestType struct {
 }
 
 func TestOpen(t *testing.T) {
-	tt := &TestType{}
-	tt.Name = "This is TestType!"
-
 	dbPath := os.TempDir() + string(os.PathSeparator) + "db"
 	if err := os.RemoveAll(dbPath); err != nil {
 		t.Fatal(err.Error())
 	}
 
-	os.Mkdir(dbPath, 0777)
-
-	os.Mkdir(dbPath+string(os.PathSeparator)+"col1", 0777)
-
-	file, err := os.Create(dbPath + string(os.PathSeparator) + "col1" + string(os.PathSeparator) + "key1")
-
-	if err != nil {
-		t.Fatal(err.Error())
-	} else {
-		file.Write([]byte(`{"msg":"Hello world!"}`))
-		file.Close()
-	}
-
-	fsdb, err := NewFsDb(dbPath)
+	db, err := NewFsDb("./db")
 	if err != nil {
 		t.Fatal("should not fail if db does exist.")
 	}
 
-	if fsdb == nil {
-		t.Fatal("fsdb not created, failing.")
+	var tt1 TestType
+	if err := db.Read("col", "key", tt1); err == nil {
+		t.Fatal("read should have failed", err.Error())
 	}
 
-	// Database functions
-
-	msg, err := fsdb.Read("col1", "key1")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	t.Log(msg)
-
-	msg, err = fsdb.Read("col1", "key2")
-	if err == nil {
-		t.Fatal("Key doesn't exist, should return error.")
+	tt2 := &TestType{}
+	tt2.Name = "Hello world!"
+	if err := db.Write("col", "key", &tt2); err != nil {
+		t.Fatal("read failed", err.Error())
 	}
 
-	msg = map[string]interface{}{
-		"msg": "Hello world!",
+	var tt3 TestType
+	if err := db.Read("col", "key", &tt3); err != nil {
+		t.Fatal("read failed", err.Error())
 	}
+	t.Log(tt3)
 
-	if err := fsdb.Write("col1", "key1", 5623524); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if err := fsdb.Write("col2", "key2", "hello"); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if err := fsdb.Write("col3", "key3", 12); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	// Delete the key can test that reading it will return error.
-	if err := fsdb.Delete("col3", "key3"); err != nil {
-		t.Fatal(err.Error())
-	}
-
-	msg, err = fsdb.Read("col3", "key3")
-	if err == nil {
-		t.Fatal("key not deleted.")
-	}
-
-	t.Log(fsdb)
-	if err := os.RemoveAll(dbPath); err != nil {
-		t.Fatal(err.Error())
-	}
 }

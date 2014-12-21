@@ -107,11 +107,11 @@ func (db *FsDb) Write(col, key string, v interface{}) error {
 }
 
 // Read key from collection
-func (db *FsDb) Read(col string, key string) (interface{}, error) {
+func (db *FsDb) Read(col string, key string, v interface{}) error {
 	if db.Collections[col] == nil {
-		return nil, errors.New("collection does not exist: " + col)
+		return errors.New("collection does not exist: " + col)
 	}
-	return db.Collections[col].read(key)
+	return db.Collections[col].read(key, v)
 }
 
 // Delete the key from collection

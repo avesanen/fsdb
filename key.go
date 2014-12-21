@@ -2,66 +2,46 @@ package fsdb
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"sync"
 	"time"
 )
 
-// Key is a Key in collection
+// key struct stores a key and manages loading, saving and deleting it
 type key struct {
-	Name       string      `json:"name"`
-	Path       string      `json:"-"`
-	File       os.File     `json:"-"`
-	LastAccess time.Time   `json:"lastAccess"`
-	Content    interface{} `json:"content"`
+	Name       string    `json:"name"`
+	Path       string    `json:"-"`
+	File       os.File   `json:"-"`
+	LastAccess time.Time `json:"lastAccess"`
+	Content    *[]byte   `json:"content"`
 	*sync.RWMutex
 }
 
-// read will return a interface{} or error
-func (k *key) read() (interface{}, error) {
+// read will read the key to v
+func (k *key) read(v interface{}) error {
 	k.RLock()
 	defer k.RUnlock()
 	k.LastAccess = time.Now()
 
-	if k.Content != nil {
-		return k.Content, nil
-	}
-	k.LastAccess = time.Now()
-
-	file, err := os.Open(k.Path)
+	b, err := ioutil.ReadFile(k.Path)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	defer file.Close()
-
-	dec := json.NewDecoder(file)
-
-	if err = dec.Decode(&k.Content); err != nil {
-		return nil, err
-	}
-
-	return k.Content, nil
+	return json.Unmarshal(b, &v)
 }
 
-// Write will write a interface{} to a file, or error.
+// write will write the v to key
 func (k *key) write(v interface{}) error {
 	k.Lock()
 	defer k.Unlock()
 	k.LastAccess = time.Now()
 
-	// Open file for writing
-	file, err := os.OpenFile(k.Path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	b, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-
-	enc := json.NewEncoder(file)
-	if err := enc.Encode(v); err != nil {
-		return err
-	}
-	k.Content = v
-	return nil
+	return ioutil.WriteFile(k.Path, b, 0666)
 }
 
 // delete will lock the file so nothing will read it, delete the file and
