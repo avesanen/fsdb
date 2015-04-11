@@ -122,6 +122,14 @@ func (db *FsDb) Delete(col string, key string) error {
 	return db.Collections[col].delete(key)
 }
 
+func (db *FsDb) List(col string) []string {
+	l := make([]string, 0)
+	for i, _ := range db.Collections[col].Keys {
+		l = append(l, i)
+	}
+	return l
+}
+
 // String will return the whole loaded database in json format (for debugging)
 func (db *FsDb) String() string {
 	b, err := json.Marshal(db)

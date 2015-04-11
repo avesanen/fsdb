@@ -35,4 +35,18 @@ func TestOpen(t *testing.T) {
 	}
 	t.Log(tt3)
 
+	l := db.List("col")
+	if len(l) == 0 {
+		t.Fatal("length of keys in collection 'col' zero!")
+	}
+
+	if err := db.Delete("col", "key"); err != nil {
+		t.Fatal("delete failed", err.Error())
+	}
+
+	l = db.List("col")
+	if len(l) != 0 {
+		t.Fatal("length of keys in collection 'col' not zero!")
+	}
+
 }
